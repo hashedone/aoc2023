@@ -7,6 +7,7 @@ import Data.Char
 import Data.Functor
 import Data.List.Split
 import Flow
+import System.TimeIt
 
 -- >>> parseLine1 "Time:      7  15   30"
 -- >>> parseLine1 "Distance:  9  40  200"
@@ -59,7 +60,7 @@ main :: IO ()
 main = do
   times <- getLine
   dists <- getLine
-  putStr $ show $ solve1 times dists
+  timeIt $ putStr $ show $ solve1 times dists
   putStr "\n"
-  putStr $ show $ solve2 times dists
+  timeIt $ putStr $ show $ solve2 times dists
   putStr "\n"

@@ -1,5 +1,5 @@
 cabal-version:      2.4
-name:               day6
+name:               day7
 version:            0.1.0.0
 
 -- A short (one-line) description of the package.
@@ -21,7 +21,7 @@ maintainer:         hash.deb@gmail.com
 -- category:
 extra-source-files: CHANGELOG.md
 
-executable day6
+executable day7
     main-is:          Main.hs
 
     -- Modules included in this executable, other than Main.
@@ -32,8 +32,6 @@ executable day6
     build-depends:
         base ^>=4.17.2.0,
         flow ^>= 2.0.0.4,
-        split ^>= 0.2.4,
-        timeit ^>= 2.0,
-
+        split ^>= 0.2.4
     hs-source-dirs:   app
     default-language: Haskell2010
