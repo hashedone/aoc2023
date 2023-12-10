@@ -1,0 +1,78 @@
+module Main where
+
+import Data.List
+import Data.Maybe
+import Debug.Trace
+import Flow
+
+index m w x y = m !! (x + w * y)
+
+-- startDir
+
+nextDir '^' '|' = '^'
+nextDir '^' '7' = '<'
+nextDir '^' 'F' = '>'
+nextDir '>' '-' = '>'
+nextDir '>' '7' = 'v'
+nextDir '>' 'J' = '^'
+nextDir 'v' '|' = 'v'
+nextDir 'v' 'J' = '<'
+nextDir 'v' 'L' = '>'
+nextDir '<' '-' = '<'
+nextDir '<' 'L' = '^'
+nextDir '<' 'F' = 'v'
+nextDir d p = error $ "Invalid dir/pipe: " ++ show (d, p)
+
+step (x, y) '^' = (x, y - 1)
+step (x, y) '>' = (x + 1, y)
+step (x, y) 'v' = (x, y + 1)
+step (x, y) '<' = (x - 1, y)
+
+move (board, x, y, dir) =
+  let (x', y') = step (x, y) dir
+      next = board x' y'
+      dir' = nextDir dir next
+   in Just ((x', y'), (board, x', y', dir'))
+
+loop board x y dir = unfoldr move (board, x, y, dir) |> takeWhile (/= (x, y)) |> ((x, y) :)
+
+solve1 l = length l `div` 2
+
+-- decide(cnt, inside, onloop, tile)
+decide (cnt, inside) False _ = (cnt + inside, inside)
+decide (cnt, inside) True '|' = (cnt, (inside + 1) `mod` 2)
+decide (cnt, inside) True 'L' = (cnt, (inside + 1) `mod` 2)
+decide (cnt, inside) True 'J' = (cnt, (inside + 1) `mod` 2)
+decide (cnt, inside) True '7' = (cnt, inside)
+decide (cnt, inside) True 'F' = (cnt, inside)
+decide (cnt, inside) True '-' = (cnt, inside)
+decide (cnt, inside) True 'S' = (cnt, (inside + 1) `mod` 2)
+
+foldChar (board, loop, y, cnt, inside) x =
+  let onloop = (x, y) `elem` loop
+      tile = board x y
+      (cnt', inside') = decide (cnt, inside) onloop tile
+   in (board, loop, y, cnt', inside')
+
+foldLine board loop w y =
+  let (_, _, _, cnt, _) = foldl foldChar (board, loop, y, 0, 0) [0 .. w - 1]
+   in cnt
+
+solve2 board loop w h = map (foldLine board loop w) [0 .. h - 1] |> sum
+
+main :: IO ()
+main = do
+  line <- getLine
+  let width = length line
+  rest <- getContents
+  let input = (line : lines rest) |> concat
+  let inputMap = index input width
+  let start = elemIndex 'S' input |> fromJust
+  let x = start `mod` width
+  let y = start `div` width
+  let dir = '>'
+  let l = loop inputMap x y dir
+  let p1 = solve1 l
+  let p2 = solve2 inputMap l width (length input `div` width)
+  print p1
+  print p2
